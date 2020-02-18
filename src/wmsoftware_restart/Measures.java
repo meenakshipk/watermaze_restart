@@ -95,12 +95,14 @@ public interface Measures {
         double sumNum = 0;
         double sumWeight = 0;
         for (int i = 0; i < size; i++) {
-            double weight = 1 / Math.pow(data.get(i).getY().doubleValue(), 2);
-            sumWeight += weight;
-            sumNum += data.get(i).getX().doubleValue() * weight;
+            if (!Double.isNaN(data.get(i).getX().doubleValue())) {
+                double weight = 1 / Math.pow(data.get(i).getY().doubleValue(), 2);
+                sumWeight += weight;
+                sumNum += data.get(i).getX().doubleValue() * weight;
+            }
         }
         double wMean = sumNum / sumWeight;
         double sdwMean = 1 / Math.sqrt(sumWeight);
         data.addData(wMean, sdwMean);
-        }
+    }
 }

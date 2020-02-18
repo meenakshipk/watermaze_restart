@@ -285,10 +285,10 @@ public abstract class Maps {
         int iXROI = 0;
         int iYROI = 0;
         Roi[] quadROIs = new Roi[4];
-        quadROIs[0] = new Roi(iXROI, iYROI, iWidth, iHeight);
-        quadROIs[1] = new Roi(iXROI + iWidth, iYROI, iWidth, iHeight);
-        quadROIs[2] = new Roi(iXROI + iWidth, iYROI + iHeight, iWidth, iHeight);
-        quadROIs[3] = new Roi(iXROI, iYROI + iHeight, iWidth, iHeight);
+        quadROIs[0] = new Roi(iXROI, iYROI, iWidth, iHeight); //Q0 - top left
+        quadROIs[1] = new Roi(iXROI + iWidth, iYROI, iWidth, iHeight); //Q1 - top right
+        quadROIs[2] = new Roi(iXROI + iWidth, iYROI + iHeight, iWidth, iHeight); //Q2 - bottom right
+        quadROIs[3] = new Roi(iXROI, iYROI + iHeight, iWidth, iHeight); //Q3 - bottom left
         RoiManager roiMan = new RoiManager(false);
         int quadNo = -1;
         for (int i = 0; i < quadROIs.length; i++) {
@@ -365,11 +365,11 @@ public abstract class Maps {
             q.addData(rt.getValueAsDouble(i, 0), rt.getValueAsDouble(i + 1, 0));
         }
         mapResultsObject.put("QuadrantMeasure", q);
-        q.clear();
+        DataTrace_ver1 z = new DataTrace_ver1();
         for (int i = (rt.getLastColumn() / 2) + 1; i < rt.getLastColumn(); i += 2) {
-            q.addData(rt.getValueAsDouble(i, 0), rt.getValueAsDouble(i + 1, 0));
+            z.addData(rt.getValueAsDouble(i, 0), rt.getValueAsDouble(i + 1, 0));
         }
-        mapResultsObject.put("ZoneMeasure", q);
+        mapResultsObject.put("ZoneMeasure", z);
 //        return qp;
     }
 }

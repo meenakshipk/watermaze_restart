@@ -711,7 +711,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                             taskLog += "Error saving" + fileName + "files.\n";
                             System.out.println();
                         }
-                        if (i != 0) {
+                        if (j != 0) {
                             mapResult.setMapResults(impResult);
                             HashMap<String, Object> mapResults = mapResult.getMapResults();
                             if (dataOutput == null) {
@@ -755,6 +755,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                     for (int j = maps.nextSetBit(1); j >= 0; j = maps.nextSetBit(j + 1)) {
                         //loop over 1 - 4 quadrants/zones
                         DataTrace_ver1 RmList = null;
+                        String keyM = "";
                         for (int idx = 0; idx < 4; idx++) {
                             RmList = new DataTrace_ver1();
                             DataTrace_ver1 QList = new DataTrace_ver1();
@@ -762,7 +763,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                             //loop mice        
                             for (int m = 0; m < totalMiceNo; m++) {
                                 Mouse mouse = mice[m];
-                                String keyM = mouse.getTrialID() + mouse.getMouseID() + keyKM + i + j;
+                                keyM = mouse.getTrialID() + mouse.getMouseID() + keyKM + i + j;
                                 if (dataOutput.containsKey(keyM)) {
                                     HashMap<String, Object> mapResults = dataOutput.get(keyM);
 
@@ -781,11 +782,14 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                                     ZList.add(z);
                                 }
                             }
-                            if (QList.size() == totalMiceNo &&  ZList.size() == totalMiceNo) {
+                            if (QList.size() == totalMiceNo && ZList.size() == totalMiceNo) {
                                 Measures.weightedMeanandSD(QList);
                                 Measures.weightedMeanandSD(ZList);
                                 // writing files
-                                
+                                File quad = new File(dir.getPath() + File.separator + "Quadrant_" + keyKM + i + j);
+                                this.writeFile("Q" + idx + trial, QList, quad);
+                                File zone = new File(dir.getPath() + File.separator + "Zone_" + keyKM + i + j);
+                                this.writeFile("P" + idx + trial, ZList, zone);
                             }
                         }
                         if (j == Integer.MAX_VALUE) {
@@ -850,6 +854,25 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
         //print dialog box
         JOptionPane.showMessageDialog(frame, "Measures calculated.", "Task completed", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButtonCalculateMeasuresActionPerformed
+
+    public File writeFile(String s, DataTrace_ver1 data, File out) {
+        try {
+            //header
+            FileWriter outStream = new FileWriter(out, true);
+            String toWrite = s.substring(2, s.length()) + "\t" + s.substring(0, 2) + "\t";
+            //file contents
+            for (int idx = 0; idx < data.size(); idx++) {
+                OrdXYData value = data.get(idx);
+                toWrite += value.getX().doubleValue() + "\t" + value.getY().doubleValue() + "\t";
+            }
+            toWrite += "\n";
+            outStream.write(toWrite);
+            outStream.close();
+        } catch (IOException e) {
+            System.out.println("Exception: " + e);
+        }
+        return out;
+    }
 
     /**
      * @param args the command line arguments
