@@ -42,8 +42,10 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javafx.scene.input.KeyCode.K;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -63,7 +65,8 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
     private int pX = 175;
     private int pY = 175;
 
-    private HashMap<String, Mouse> data = null;
+    private HashMap<String, Mouse> dataInput = null;
+    private HashMap<String, HashMap<String, Object>> dataOutput = null;
 
     /**
      * Creates new form WMSoftwareGUI
@@ -530,14 +533,14 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonReadFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadFilesActionPerformed
-        //store file in data hashmap
-        data = new HashMap<>();
+        //store file in dataInput hashmap
+        dataInput = new HashMap<>();
         for (int r = 0; r < jTableList.getRowCount(); r++) {
             String trial = jTableList.getValueAt(r, 0).toString();
             String mouse = jTableList.getValueAt(r, 1).toString();
             File file = new File(jTableList.getValueAt(r, 2).toString());
             String key = trial + mouse;
-            data.put(key, new Mouse(trial, mouse, file));
+            dataInput.put(key, new Mouse(trial, mouse, file));
         }
         //print dialog box
         JOptionPane.showMessageDialog(frame, "Files read.", "Task completed", JOptionPane.INFORMATION_MESSAGE);
@@ -610,11 +613,13 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
 
         //BitSet logic for output
         BitSet bs = null;
-        Iterator<HashMap.Entry<String, Mouse>> iterData = data.entrySet().iterator();
+        Set<String> keySetKM = null;
+        Iterator<HashMap.Entry<String, Mouse>> iterData = dataInput.entrySet().iterator();
         while (iterData.hasNext()) {
             HashMap.Entry<String, Mouse> pair = iterData.next();
             Mouse mouse = pair.getValue();
             HashMap<String, KinematicMeasures> mouseKM = mouse.getKinematicMeasures();
+            keySetKM = mouseKM.keySet(); // use later?
             Iterator<HashMap.Entry<String, KinematicMeasures>> iterKM = mouseKM.entrySet().iterator();
             File saveDir = null;
             while (iterKM.hasNext()) {
@@ -707,9 +712,81 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                             System.out.println();
                         }
                         if (i != 0) {
-                            mapResult.setMapResultsObject(impResult);
-                            HashMap<String, Object> mapProperties = mapResult.getMapResultsObject();
-                            mouse.setMapProperties(keyKM, mapProperties);
+                            mapResult.setMapResults(impResult);
+                            HashMap<String, Object> mapResults = mapResult.getMapResults();
+                            if (dataOutput == null) {
+                                dataOutput = new HashMap<>();
+                            }
+                            dataOutput.put(keyMouse + keyKM + i + j, mapResults);
+                        }
+                        if (j == Integer.MAX_VALUE) {
+                            break;
+                        }
+                    }
+                    if (i == Integer.MAX_VALUE) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        //OUTPUT FROM MAPS
+        //loop trial
+        //collect all mice of a trial in order
+        Mouse[] mice = new Mouse[totalMiceNo];
+        for (int t = 0; t < totalTrialNo; t++) {
+            String trial = "T" + String.format("%02d", t);
+            for (HashMap.Entry<String, Mouse> mousepair : dataInput.entrySet()) {
+                if (mousepair.getKey().substring(0, 3).matches(trial)) {
+                    Mouse mouse = mousepair.getValue();
+//                    System.out.println("Check" + mouse.getTrialID() + " " + trial);
+                    String id = mouse.getMouseID();
+                    int m = Integer.valueOf(id.substring(1, id.length()));
+//                    System.out.println("Mouse ID: " + id + " As int: " + m);
+                    mice[m] = mousepair.getValue();
+                }
+            }
+            //loop kinematic measures
+            for (Iterator<String> it = keySetKM.iterator(); it.hasNext();) {
+                String keyKM = it.next();
+                //loop spatial properties i
+                for (int i = spatialProperties.nextSetBit(0); i >= 0; i = spatialProperties.nextSetBit(i + 1)) {
+                    //loop map properties j
+                    for (int j = maps.nextSetBit(1); j >= 0; j = maps.nextSetBit(j + 1)) {
+                        //loop over 1 - 4 quadrants/zones
+                        DataTrace_ver1 RmList = null;
+                        for (int idx = 0; idx < 4; idx++) {
+                            RmList = new DataTrace_ver1();
+                            DataTrace_ver1 QList = new DataTrace_ver1();
+                            DataTrace_ver1 ZList = new DataTrace_ver1();
+                            //loop mice        
+                            for (int m = 0; m < totalMiceNo; m++) {
+                                Mouse mouse = mice[m];
+                                String keyM = mouse.getTrialID() + mouse.getMouseID() + keyKM + i + j;
+                                if (dataOutput.containsKey(keyM)) {
+                                    HashMap<String, Object> mapResults = dataOutput.get(keyM);
+
+                                    //Rm - calculated only once
+                                    if (RmList == null) {
+                                        OrdXYData Rm = (OrdXYData) mapResults.get("Rm");
+                                        RmList.add(Rm);
+                                    }
+                                    //Quad
+                                    DataTrace_ver1 quadrant = (DataTrace_ver1) mapResults.get("QuadrantMeasure");
+                                    //Zone
+                                    DataTrace_ver1 zone = (DataTrace_ver1) mapResults.get("ZoneMeasure");
+                                    OrdXYData q = quadrant.get(idx);
+                                    OrdXYData z = zone.get(idx);
+                                    QList.add(q);
+                                    ZList.add(z);
+                                }
+                            }
+                            if (QList.size() == totalMiceNo &&  ZList.size() == totalMiceNo) {
+                                Measures.weightedMeanandSD(QList);
+                                Measures.weightedMeanandSD(ZList);
+                                // writing files
+                                
+                            }
                         }
                         if (j == Integer.MAX_VALUE) {
                             break;
@@ -756,7 +833,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
 
     private void jButtonCalculateMeasuresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateMeasuresActionPerformed
         //iterate over hashmap
-        Iterator<HashMap.Entry<String, Mouse>> it = data.entrySet().iterator();
+        Iterator<HashMap.Entry<String, Mouse>> it = dataInput.entrySet().iterator();
         while (it.hasNext()) {
             HashMap.Entry<String, Mouse> pair = it.next();
             Mouse mouse = pair.getValue();

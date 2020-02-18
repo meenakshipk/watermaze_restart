@@ -100,7 +100,7 @@ public interface Measures {
             sumNum += data.get(i).getX().doubleValue() * weight;
         }
         double wMean = sumNum / sumWeight;
-        double sdwMean = Math.sqrt(sumWeight);
+        double sdwMean = 1 / Math.sqrt(sumWeight);
         data.addData(wMean, sdwMean);
         }
 }

@@ -28,7 +28,7 @@ public class Mouse {
 //    KinematicMeasures velocity = null;
 //    KinematicMeasures acceleration = null;
 //    KinematicMeasures jerk = null;
-    private HashMap<String, HashMap<String, Object>> kinematicMeasuresMapProperties = null;
+//    private HashMap<String, HashMap<String, Object>> kinematicMeasuresMapProperties = null;
 
     int pX = 175; //later make it into another object? like experiment or platform or pool?
     int pY = 175; //later make it into another object? like experiment or platform or pool?
@@ -77,42 +77,42 @@ public class Mouse {
         return this.getKinematicMeasures("Jerk");
     }
 
-    public HashMap<String, Object> getMapProperties(String kinematicMeasure) {
-        HashMap<String, Object> mapProperties = null;
-        if (kinematicMeasuresMapProperties.containsKey(kinematicMeasure)) {
-            kinematicMeasuresMapProperties.get(kinematicMeasure);
-        }
-        return mapProperties;
-    }
+//    public HashMap<String, Object> getMapProperties(String kinematicMeasure) {
+//        HashMap<String, Object> mapProperties = null;
+//        if (kinematicMeasuresMapProperties.containsKey(kinematicMeasure)) {
+//            kinematicMeasuresMapProperties.get(kinematicMeasure);
+//        }
+//        return mapProperties;
+//    }
 
-    private Object getMapProperty(String kinematicMeasure, String mapProperty) {
-        HashMap<String, Object> mapProperties = this.getMapProperties(kinematicMeasure);
-        Object result = null;
-        if (mapProperties.containsKey(mapProperty)) {
-            result = (OrdXYData) mapProperties.get(mapProperty);
-        }
-        return result;
-    }
-
-    public OrdXYData getMapPropertyRm(String kinematicMeasure) {
-        OrdXYData result = (OrdXYData) this.getMapProperty(kinematicMeasure, "Rm");
-        return result;
-    }
-
-    public DataTrace_ver1 getMapPropertyQuadrant(String kinematicMeasure) {
-        DataTrace_ver1 result = (DataTrace_ver1) this.getMapProperty(kinematicMeasure, "QuadrantMeasure");
-        return result;
-    }
-
-    public DataTrace_ver1 getMapPropertyZone(String kinematicMeasure) {
-        DataTrace_ver1 result = (DataTrace_ver1) this.getMapProperty(kinematicMeasure, "ZoneMeasure");
-        return result;
-    }
-
-    public void setMapProperties(String kinematicMeasure, HashMap<String, Object> mp) {
-        kinematicMeasuresMapProperties = new HashMap<>();
-        kinematicMeasuresMapProperties.put(kinematicMeasure, mp);
-    }
+//    private Object getMapProperty(String kinematicMeasure, String mapProperty) {
+//        HashMap<String, Object> mapProperties = this.getMapProperties(kinematicMeasure);
+//        Object result = null;
+//        if (mapProperties.containsKey(mapProperty)) {
+//            result = (OrdXYData) mapProperties.get(mapProperty);
+//        }
+//        return result;
+//    }
+//
+//    public OrdXYData getMapPropertyRm(String kinematicMeasure) {
+//        OrdXYData result = (OrdXYData) this.getMapProperty(kinematicMeasure, "Rm");
+//        return result;
+//    }
+//
+//    public DataTrace_ver1 getMapPropertyQuadrant(String kinematicMeasure) {
+//        DataTrace_ver1 result = (DataTrace_ver1) this.getMapProperty(kinematicMeasure, "QuadrantMeasure");
+//        return result;
+//    }
+//
+//    public DataTrace_ver1 getMapPropertyZone(String kinematicMeasure) {
+//        DataTrace_ver1 result = (DataTrace_ver1) this.getMapProperty(kinematicMeasure, "ZoneMeasure");
+//        return result;
+//    }
+//
+//    public void setMapProperties(String kinematicMeasure, HashMap<String, Object> mp) {
+//        kinematicMeasuresMapProperties = new HashMap<>();
+//        kinematicMeasuresMapProperties.put(kinematicMeasure, mp);
+//    }
 
     public void setVelocity() {
         if (displacement == null) {

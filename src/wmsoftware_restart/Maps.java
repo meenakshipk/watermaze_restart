@@ -68,11 +68,11 @@ public abstract class Maps {
         measure = m;
     }
 
-    public HashMap<String, Object> getMapResultsObject() {
+    public HashMap<String, Object> getMapResults() {
         return mapResultsObject;
     }
 
-    public void setMapResultsObject(ImagePlus imp) {
+    public void setMapResults(ImagePlus imp) {
         mapResultsObject = new HashMap<>();
         ImageProcessor ip = imp.getProcessor();
         this.RmFromMap(ip);
@@ -359,7 +359,7 @@ public abstract class Maps {
         //set mean measurement, multimeasure using 8 rois in roimanager, get results table
         Analyzer.setMeasurements(Measurements.MEAN + Measurements.STD_DEV);
         ResultsTable rt = roiMan.multiMeasure(imp);
-        rt.show("");
+//        rt.show("");
         DataTrace_ver1 q = new DataTrace_ver1();
         for (int i = 0; i < rt.getLastColumn() / 2; i += 2) {
             q.addData(rt.getValueAsDouble(i, 0), rt.getValueAsDouble(i + 1, 0));
