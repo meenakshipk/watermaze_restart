@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static javafx.scene.input.KeyCode.K;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -55,15 +56,16 @@ import javax.swing.table.TableModel;
  */
 public class WMSoftwareGUI extends javax.swing.JFrame {
 
-    private int totalMiceNo;
-    private int totalTrialNo;
-    private File dir;
     private Component frame;
-    private double userBin;
+    private String taskLog = "";
     private int dimX = 240;
     private int dimY = 240;
     private int pX = 175;
     private int pY = 175;
+    private int totalMiceNo;
+    private int totalTrialNo;
+    private File dir;
+    private double userBin;
 
     private HashMap<String, Mouse> dataInput = null;
     private HashMap<String, HashMap<String, Object>> dataOutput = null;
@@ -107,8 +109,6 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
         jCheckBoxJerk = new javax.swing.JCheckBox();
         jButtonCalculateMeasures = new javax.swing.JButton();
         jCheckBoxVelocity = new javax.swing.JCheckBox();
-        jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel8 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabelMaps = new javax.swing.JLabel();
         jCheckBoxAlongPt = new javax.swing.JCheckBox();
@@ -123,8 +123,8 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
         jButtonGenerateMaps = new javax.swing.JButton();
         jCheckBoxAverageMouseMap = new javax.swing.JCheckBox();
         jCheckBoxHeatMap = new javax.swing.JCheckBox();
-        jProgressBar = new javax.swing.JProgressBar();
-        jLabel6 = new javax.swing.JLabel();
+        progressBarMaps = new javax.swing.JProgressBar();
+        jLabelProgressBarMaps = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jCheckBoxRDistvRVel = new javax.swing.JCheckBox();
         jCheckBoxRDistvRVelaP = new javax.swing.JCheckBox();
@@ -135,8 +135,8 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
         jTextFieldUserBin = new javax.swing.JTextField();
         jButtonGeneratePlots = new javax.swing.JButton();
         jCheckBoxAverageMousePlot = new javax.swing.JCheckBox();
-        jLabel7 = new javax.swing.JLabel();
-        jProgressBar2 = new javax.swing.JProgressBar();
+        jLabelProgressBarPlots = new javax.swing.JLabel();
+        progressBarPlots = new javax.swing.JProgressBar();
 
         jDialog1.setTitle("Select files");
         jDialog1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -280,8 +280,6 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
 
         jCheckBoxVelocity.setText("Velocity");
 
-        jLabel8.setText("Progress Bar:");
-
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -289,21 +287,12 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBoxVelocity)
-                                    .addComponent(jLabelMaps2)
-                                    .addComponent(jCheckBoxAcceleration)
-                                    .addComponent(jCheckBoxJerk)
-                                    .addComponent(jButtonCalculateMeasures))
-                                .addGap(142, 183, Short.MAX_VALUE)))
-                        .addGap(292, 292, 292))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(jCheckBoxVelocity)
+                    .addComponent(jLabelMaps2)
+                    .addComponent(jCheckBoxAcceleration)
+                    .addComponent(jCheckBoxJerk)
+                    .addComponent(jButtonCalculateMeasures))
+                .addContainerGap(475, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -318,11 +307,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                 .addComponent(jCheckBoxJerk)
                 .addGap(106, 106, 106)
                 .addComponent(jButtonCalculateMeasures)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(89, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Calculate Measure", jPanel4);
@@ -360,7 +345,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
 
         jCheckBoxHeatMap.setText("Heat map");
 
-        jLabel6.setText("Progress Bar:");
+        jLabelProgressBarMaps.setText("Progress Bar:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -371,7 +356,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(progressBarMaps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jCheckBoxVecField)
@@ -391,7 +376,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                                     .addComponent(jCheckBoxHeatMap))))
                         .addGap(292, 292, 292))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
+                        .addComponent(jLabelProgressBarMaps)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
@@ -427,9 +412,9 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonGenerateMaps)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addComponent(jLabel6)
+                .addComponent(jLabelProgressBarMaps)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(progressBarMaps, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -459,7 +444,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
 
         jCheckBoxAverageMousePlot.setText("Average Mouse");
 
-        jLabel7.setText("Progress Bar:");
+        jLabelProgressBarPlots.setText("Progress Bar:");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -478,9 +463,9 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextFieldUserBin, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel7)
+                    .addComponent(jLabelProgressBarPlots)
                     .addComponent(jButtonGeneratePlots)
-                    .addComponent(jProgressBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(progressBarPlots, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(292, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -505,9 +490,9 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jButtonGeneratePlots)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel7)
+                .addComponent(jLabelProgressBarPlots)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(progressBarPlots, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -589,250 +574,17 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonSelectFilesActionPerformed
 
     private void jButtonGenerateMapsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGenerateMapsActionPerformed
-        String taskLog = "";
-        //Select directory to store files
-        JFileChooser Fc = new JFileChooser();
-        Fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        Fc.showOpenDialog(this);
-        dir = Fc.getSelectedFile();
-
-        //BitSet for spatial properties
-        BitSet spatialProperties = new BitSet(4);
-        spatialProperties.set(0, jCheckBoxVecField.isSelected());
-        spatialProperties.set(1, jCheckBoxErrVec.isSelected());
-        spatialProperties.set(2, jCheckBoxAlongPt.isSelected());
-        spatialProperties.set(3, jCheckBoxOrthoPt.isSelected());
-
-        //BitSet for user selected output file type
-        BitSet maps = new BitSet(5);
-        maps.set(0, jCheckBoxASCIIvector.isSelected());
-        maps.set(1, jCheckBoxDivergence.isSelected());
-        maps.set(2, jCheckBoxCurl.isSelected());
-        maps.set(3, jCheckBoxHeatMap.isSelected());
-        maps.set(4, jCheckBoxGradient.isSelected());
-
-        //BitSet logic for output
-        BitSet bs = null;
-        Set<String> keySetKM = null;
-        Iterator<HashMap.Entry<String, Mouse>> iterData = dataInput.entrySet().iterator();
-        while (iterData.hasNext()) {
-            HashMap.Entry<String, Mouse> pair = iterData.next();
-            Mouse mouse = pair.getValue();
-            HashMap<String, KinematicMeasures> mouseKM = mouse.getKinematicMeasures();
-            keySetKM = mouseKM.keySet(); // use later?
-            Iterator<HashMap.Entry<String, KinematicMeasures>> iterKM = mouseKM.entrySet().iterator();
-            File saveDir = null;
-            while (iterKM.hasNext()) {
-                HashMap.Entry<String, KinematicMeasures> pair2 = iterKM.next();
-                KinematicMeasures kM = pair2.getValue();
-                DataTrace_ver1 vectorMeasure = null;
-                ArrayList<Double> scalarMeasure = null;
-                VectorMaps vectorMap = null;
-                ScalarMaps scalarMap = null;
-//                Maps map = null;
-                String keySP = null;
-                for (int i = spatialProperties.nextSetBit(0); i >= 0; i = spatialProperties.nextSetBit(i + 1)) {
-                    switch (i) {
-                        case 0:
-                            vectorMeasure = kM.getMeasure(); //vector measure in bs2 0
-                            bs = (BitSet) maps.clone();
-                            bs.clear(3, 5);
-                            keySP = "vectorfield";
-                            break;
-                        case 1:
-                            vectorMeasure = kM.getMeasureError();//vector error measure in bs2 1
-                            bs = (BitSet) maps.clone();
-                            bs.clear(3, 5);
-                            keySP = "error";
-                            break;
-                        case 2:
-                            scalarMeasure = kM.getMeasureAlongPt(); //alongpt measure in bs2 2
-                            bs = (BitSet) maps.clone();
-                            bs.clear(0, 3);
-                            keySP = "alongPt";
-                            break;
-                        case 3:
-                            scalarMeasure = kM.getMeasureOrthoPt(); //orthopt measure in bs2 3
-                            bs = (BitSet) maps.clone();
-                            bs.clear(0, 3);
-                            keySP = "orthoPt";
-                            break;
-                    }
-                    if (i < 2) {
-                        vectorMap = new VectorMaps(mouse.getPosition());
-                        vectorMap.setMeasure(vectorMeasure);
-                    } else {
-                        scalarMap = new ScalarMaps(mouse.getPosition());
-                        scalarMap.setMeasure(scalarMeasure);
-                    }
-                    ImagePlus impResult = null;
-                    Maps mapResult = null;
-                    String keyMP = "";
-                    for (int j = bs.nextSetBit(0); j >= 0; j = bs.nextSetBit(j + 1)) {
-                        switch (j) {
-                            case 0:
-                                impResult = vectorMap.vectorField();
-                                mapResult = vectorMap;
-                                keyMP = "map";
-                                break;
-                            case 1:
-                                impResult = vectorMap.divergence();
-                                mapResult = vectorMap;
-                                keyMP = "div";
-                                break;
-                            case 2:
-                                impResult = vectorMap.curl();
-                                mapResult = vectorMap;
-                                keyMP = "curl";
-                                break;
-                            case 3:
-                                impResult = scalarMap.heatMap();
-                                mapResult = scalarMap;
-                                keyMP = "hm";
-                                break;
-                            case 4:
-                                impResult = scalarMap.gradient();
-                                mapResult = scalarMap;
-                                keyMP = "grad";
-                                break;
-                        }
-//                      impResult.show();
-                        String keyMouse = pair.getKey();
-                        String keyKM = pair2.getKey();
-                        String fileName = keyKM + "_" + keySP + "_" + keyMP + "_" + keyMouse;
-                        impResult.setTitle(fileName);
-                        try {
-                            saveDir = new File(dir.getPath() + File.separator + keyKM);
-                            saveDir.mkdir();
-                            new FileSaver(impResult).saveAsTiff(saveDir + File.separator + impResult.getTitle() + ".tif");
-                        } catch (Exception e) {
-                            System.out.println("Error saving" + fileName + "file.");
-                            System.out.println(e);
-                            taskLog += "Error saving" + fileName + "files.\n";
-                            System.out.println();
-                        }
-                        if (j != 0) {
-                            mapResult.setMapResults(impResult);
-                            HashMap<String, Object> mapResults = mapResult.getMapResults();
-                            if (dataOutput == null) {
-                                dataOutput = new HashMap<>();
-                            }
-                            dataOutput.put(keyMouse + keyKM + i + j, mapResults);
-                        }
-                        if (j == Integer.MAX_VALUE) {
-                            break;
-                        }
-                    }
-                    if (i == Integer.MAX_VALUE) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        //OUTPUT FROM MAPS
-        //loop trial
-        //collect all mice of a trial in order
-        Mouse[] mice = new Mouse[totalMiceNo];
-        for (int t = 0; t < totalTrialNo; t++) {
-            String trial = "T" + String.format("%02d", t);
-            for (HashMap.Entry<String, Mouse> mousepair : dataInput.entrySet()) {
-                if (mousepair.getKey().substring(0, 3).matches(trial)) {
-                    Mouse mouse = mousepair.getValue();
-//                    System.out.println("Check" + mouse.getTrialID() + " " + trial);
-                    String id = mouse.getMouseID();
-                    int m = Integer.valueOf(id.substring(1, id.length()));
-//                    System.out.println("Mouse ID: " + id + " As int: " + m);
-                    mice[m] = mousepair.getValue();
-                }
-            }
-            //loop kinematic measures
-            for (Iterator<String> it = keySetKM.iterator(); it.hasNext();) {
-                String keyKM = it.next();
-                //loop spatial properties i
-                for (int i = spatialProperties.nextSetBit(0); i >= 0; i = spatialProperties.nextSetBit(i + 1)) {
-                    //loop map properties j
-                    for (int j = maps.nextSetBit(1); j >= 0; j = maps.nextSetBit(j + 1)) {
-                        //loop over 1 - 4 quadrants/zones
-                        DataTrace_ver1 RmList = null;
-                        String keyM = "";
-                        for (int idx = 0; idx < 4; idx++) {
-                            RmList = new DataTrace_ver1();
-                            DataTrace_ver1 QList = new DataTrace_ver1();
-                            DataTrace_ver1 ZList = new DataTrace_ver1();
-                            //loop mice        
-                            for (int m = 0; m < totalMiceNo; m++) {
-                                Mouse mouse = mice[m];
-                                keyM = mouse.getTrialID() + mouse.getMouseID() + keyKM + i + j;
-                                if (dataOutput.containsKey(keyM)) {
-                                    HashMap<String, Object> mapResults = dataOutput.get(keyM);
-
-                                    //Rm - calculated only once
-                                    if (RmList == null) {
-                                        OrdXYData Rm = (OrdXYData) mapResults.get("Rm");
-                                        RmList.add(Rm);
-                                    }
-                                    //Quad
-                                    DataTrace_ver1 quadrant = (DataTrace_ver1) mapResults.get("QuadrantMeasure");
-                                    //Zone
-                                    DataTrace_ver1 zone = (DataTrace_ver1) mapResults.get("ZoneMeasure");
-                                    OrdXYData q = quadrant.get(idx);
-                                    OrdXYData z = zone.get(idx);
-                                    QList.add(q);
-                                    ZList.add(z);
-                                }
-                            }
-                            if (QList.size() == totalMiceNo && ZList.size() == totalMiceNo) {
-                                Measures.weightedMeanandSD(QList);
-                                Measures.weightedMeanandSD(ZList);
-                                // writing files
-                                File quad = new File(dir.getPath() + File.separator + "Quadrant_" + keyKM + i + j);
-                                this.writeFile("Q" + idx + trial, QList, quad);
-                                File zone = new File(dir.getPath() + File.separator + "Zone_" + keyKM + i + j);
-                                this.writeFile("P" + idx + trial, ZList, zone);
-                            }
-                        }
-                        if (j == Integer.MAX_VALUE) {
-                            break;
-                        }
-                    }
-                    if (i == Integer.MAX_VALUE) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!taskLog.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Task completed with the following errors:\n" + taskLog, "Task Completed with Error.", JOptionPane.WARNING_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(frame, "Task completed.\n" + taskLog, "Task Completed", JOptionPane.INFORMATION_MESSAGE);
-        }
+        jLabelProgressBarMaps.setText("Progress:");
+        progressBarMaps.setValue(0);
+        progressBarMaps.setIndeterminate(true);
+        (new taskGenerateMaps()).execute();
     }//GEN-LAST:event_jButtonGenerateMapsActionPerformed
 
     private void jButtonGeneratePlotsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGeneratePlotsActionPerformed
-        String taskLog = "";
-        if (dir == null) {
-            JOptionPane.showMessageDialog(frame, "Please select directory to save plots.", "ERROR", JOptionPane.ERROR_MESSAGE);
-            //Select directory to store files
-            JFileChooser Fc = new JFileChooser();
-            Fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            Fc.showOpenDialog(this);
-            dir = Fc.getSelectedFile();
-        }
-
-        //bitset for user selection of distvmeasure plot
-        BitSet bs = new BitSet(4);
-        bs.set(0, jCheckBoxRDistvRVel.isSelected());
-        bs.set(1, jCheckBoxRDistvRVelaP.isSelected());
-        bs.set(2, jCheckBoxRDistvRVelpP.isSelected());
-        bs.set(3, jCheckBoxRDistvRVelErr.isSelected());
-
-        if (!taskLog.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Task completed with the following errors:\n" + taskLog, "Task Completed with Error.", JOptionPane.WARNING_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(frame, "Task completed.\n" + taskLog, "Task Completed", JOptionPane.INFORMATION_MESSAGE);
-        }
+        jLabelProgressBarPlots.setText("Progress:");
+        progressBarPlots.setValue(0);
+        progressBarPlots.setIndeterminate(true);
+        (new taskGeneratePlots()).execute();
     }//GEN-LAST:event_jButtonGeneratePlotsActionPerformed
 
     private void jButtonCalculateMeasuresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateMeasuresActionPerformed
@@ -855,7 +607,7 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(frame, "Measures calculated.", "Task completed", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButtonCalculateMeasuresActionPerformed
 
-    public File writeFile(String s, DataTrace_ver1 data, File out) {
+    private File writeFile(String s, DataTrace_ver1 data, File out) {
         try {
             //header
             FileWriter outStream = new FileWriter(out, true);
@@ -872,6 +624,299 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
             System.out.println("Exception: " + e);
         }
         return out;
+    }
+
+    private class taskGenerateMaps extends SwingWorker<Void, String> {
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            taskLog = "";
+            //Select directory to store files
+            if (dir == null) {
+                JFileChooser Fc = new JFileChooser();
+                Fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int status = Fc.showOpenDialog(null);
+                if (status == JFileChooser.CANCEL_OPTION) {
+                    return null;
+                }
+                dir = Fc.getSelectedFile();
+            }
+
+            //BitSet for spatial properties
+            BitSet spatialProperties = new BitSet(4);
+            spatialProperties.set(0, jCheckBoxVecField.isSelected());
+            spatialProperties.set(1, jCheckBoxErrVec.isSelected());
+            spatialProperties.set(2, jCheckBoxAlongPt.isSelected());
+            spatialProperties.set(3, jCheckBoxOrthoPt.isSelected());
+
+            //BitSet for user selected output file type
+            BitSet maps = new BitSet(5);
+            maps.set(0, jCheckBoxASCIIvector.isSelected());
+            maps.set(1, jCheckBoxDivergence.isSelected());
+            maps.set(2, jCheckBoxCurl.isSelected());
+            maps.set(3, jCheckBoxHeatMap.isSelected());
+            maps.set(4, jCheckBoxGradient.isSelected());
+
+            //BitSet logic for output
+            BitSet bs = null;
+            Set<String> keySetKM = null;
+            Iterator<HashMap.Entry<String, Mouse>> iterData = dataInput.entrySet().iterator();
+            while (iterData.hasNext()) {
+                HashMap.Entry<String, Mouse> pair = iterData.next();
+                Mouse mouse = pair.getValue();
+                HashMap<String, KinematicMeasures> mouseKM = mouse.getKinematicMeasures();
+                keySetKM = mouseKM.keySet(); // used later when calculating weighted mean and SD.
+                Iterator<HashMap.Entry<String, KinematicMeasures>> iterKM = mouseKM.entrySet().iterator();
+                File saveDir = null;
+                while (iterKM.hasNext()) {
+                    HashMap.Entry<String, KinematicMeasures> pair2 = iterKM.next();
+                    KinematicMeasures kM = pair2.getValue();
+                    DataTrace_ver1 vectorMeasure = null;
+                    ArrayList<Double> scalarMeasure = null;
+                    VectorMaps vectorMap = null;
+                    ScalarMaps scalarMap = null;
+                    String keySP = null;
+                    for (int i = spatialProperties.nextSetBit(0); i >= 0; i = spatialProperties.nextSetBit(i + 1)) {
+                        switch (i) {
+                            case 0:
+                                vectorMeasure = kM.getMeasure(); //vector measure in bs2 0
+                                bs = (BitSet) maps.clone();
+                                bs.clear(3, 5);
+                                //why clone and use instead of using bs.get(x,y) where x y are the idx of interest?
+                                keySP = "vfield";
+                                break;
+                            case 1:
+                                vectorMeasure = kM.getMeasureError();//vector error measure in bs2 1
+                                bs = (BitSet) maps.clone();
+                                bs.clear(3, 5);
+                                keySP = "error";
+                                break;
+                            case 2:
+                                scalarMeasure = kM.getMeasureAlongPt(); //alongpt measure in bs2 2
+                                bs = (BitSet) maps.clone();
+                                bs.clear(0, 3);
+                                keySP = "alongPt";
+                                break;
+                            case 3:
+                                scalarMeasure = kM.getMeasureOrthoPt(); //orthopt measure in bs2 3
+                                bs = (BitSet) maps.clone();
+                                bs.clear(0, 3);
+                                keySP = "orthoPt";
+                                break;
+                        }
+                        if (i < 2) {
+                            vectorMap = new VectorMaps(mouse.getPosition());
+                            vectorMap.setMeasure(vectorMeasure);
+                        } else {
+                            scalarMap = new ScalarMaps(mouse.getPosition());
+                            scalarMap.setMeasure(scalarMeasure);
+                        }
+                        ImagePlus impResult = null;
+                        Maps mapResult = null;
+                        String keyMP = "";
+                        for (int j = bs.nextSetBit(0); j >= 0; j = bs.nextSetBit(j + 1)) {
+                            switch (j) {
+                                case 0:
+                                    impResult = vectorMap.vectorField();
+                                    mapResult = vectorMap;
+                                    keyMP = "vm";
+                                    break;
+                                case 1:
+                                    impResult = vectorMap.divergence();
+                                    mapResult = vectorMap;
+                                    keyMP = "div";
+                                    break;
+                                case 2:
+                                    impResult = vectorMap.curl();
+                                    mapResult = vectorMap;
+                                    keyMP = "curl";
+                                    break;
+                                case 3:
+                                    impResult = scalarMap.heatMap();
+                                    mapResult = scalarMap;
+                                    keyMP = "hm";
+                                    break;
+                                case 4:
+                                    impResult = scalarMap.gradient();
+                                    mapResult = scalarMap;
+                                    keyMP = "grad";
+                                    break;
+                            }
+//                      impResult.show();
+                            String keyMouse = pair.getKey();
+                            String keyKM = pair2.getKey();
+                            String fileName = keyKM + "_" + keySP + "_" + keyMP + "_" + keyMouse;
+                            impResult.setTitle(fileName);
+                            try {
+                                saveDir = new File(dir.getPath() + File.separator + keyKM + "_" + keySP);
+                                saveDir.mkdir();
+                                new FileSaver(impResult).saveAsTiff(saveDir + File.separator + impResult.getTitle() + ".tif");
+                            } catch (Exception e) {
+                                System.out.println("Error saving" + fileName + "file.");
+                                System.out.println(e);
+                                taskLog += "Error saving" + fileName + "files.\n";
+                                System.out.println();
+                            }
+                            if (j != 0) {
+                                mapResult.setMapResults(impResult);
+                                HashMap<String, Object> mapResults = mapResult.getMapResults();
+                                if (dataOutput == null) {
+                                    dataOutput = new HashMap<>();
+                                }
+                                dataOutput.put(keyMouse + keyKM + i + j, mapResults);
+                            }
+                            publish("Trial/Mouse: " + keyMouse + " Kinematic Measure: " + keyKM + " Spatial property: " + keySP + " Map: " + keyMP);
+                            if (j == Integer.MAX_VALUE) {
+                                break;
+                            }
+                        }
+                        if (i == Integer.MAX_VALUE) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //OUTPUT FROM MAPS
+            //loop trial
+            //collect all mice of a trial in order
+            Mouse[] mice = new Mouse[totalMiceNo];
+            for (int t = 0; t < totalTrialNo; t++) {
+                String trial = "T" + String.format("%02d", t);
+                for (HashMap.Entry<String, Mouse> mousepair : dataInput.entrySet()) {
+                    if (mousepair.getKey().substring(0, 3).matches(trial)) {
+                        Mouse mouse = mousepair.getValue();
+//                    System.out.println("Check" + mouse.getTrialID() + " " + trial);
+                        String id = mouse.getMouseID();
+                        int m = Integer.valueOf(id.substring(1, id.length()));
+//                    System.out.println("Mouse ID: " + id + " As int: " + m);
+                        mice[m] = mousepair.getValue();
+                    }
+                }
+                //loop kinematic measures
+                for (Iterator<String> it = keySetKM.iterator(); it.hasNext();) {
+                    String keyKM = it.next();
+                    //loop spatial properties i
+                    for (int i = spatialProperties.nextSetBit(0); i >= 0; i = spatialProperties.nextSetBit(i + 1)) {
+                        //loop map properties j
+                        for (int j = maps.nextSetBit(1); j >= 0; j = maps.nextSetBit(j + 1)) {
+                            //loop over 1 - 4 quadrants/zones
+                            DataTrace_ver1 RmList = null;
+                            String keyM = "";
+                            for (int idx = 0; idx < 4; idx++) {
+                                RmList = new DataTrace_ver1();
+                                DataTrace_ver1 QList = new DataTrace_ver1();
+                                DataTrace_ver1 ZList = new DataTrace_ver1();
+                                //loop mice        
+                                for (int m = 0; m < totalMiceNo; m++) {
+                                    Mouse mouse = mice[m];
+                                    keyM = mouse.getTrialID() + mouse.getMouseID() + keyKM + i + j;
+                                    if (dataOutput.containsKey(keyM)) {
+                                        HashMap<String, Object> mapResults = dataOutput.get(keyM);
+
+                                        //Rm - calculated only once
+                                        if (RmList == null) {
+                                            OrdXYData Rm = (OrdXYData) mapResults.get("Rm");
+                                            RmList.add(Rm);
+                                        }
+                                        //Quad
+                                        DataTrace_ver1 quadrant = (DataTrace_ver1) mapResults.get("QuadrantMeasure");
+                                        //Zone
+                                        DataTrace_ver1 zone = (DataTrace_ver1) mapResults.get("ZoneMeasure");
+                                        OrdXYData q = quadrant.get(idx);
+                                        OrdXYData z = zone.get(idx);
+                                        QList.add(q);
+                                        ZList.add(z);
+                                    }
+                                }
+                                if (QList.size() == totalMiceNo && ZList.size() == totalMiceNo) {
+                                    Measures.weightedMeanandSD(QList);
+                                    Measures.weightedMeanandSD(ZList);
+                                    // writing files
+                                    File quad = new File(dir.getPath() + File.separator + "Quadrant_" + keyKM + i + j);
+                                    WMSoftwareGUI.this.writeFile("Q" + idx + trial, QList, quad);
+                                    File zone = new File(dir.getPath() + File.separator + "Zone_" + keyKM + i + j);
+                                    WMSoftwareGUI.this.writeFile("P" + idx + trial, ZList, zone);
+                                }
+                            }
+                            publish("Writing ASCII files for Kinematic Measure: " + keyKM);
+                            if (j == Integer.MAX_VALUE) {
+                                break;
+                            }
+                        }
+                        if (i == Integer.MAX_VALUE) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void process(java.util.List<String> chunks) {
+            String curValue = chunks.get(chunks.size() - 1);
+            jLabelProgressBarMaps.setText("Progress: " + curValue);
+        }
+
+        @Override
+        protected void done() {
+            jLabelProgressBarMaps.setText("Progress Bar: Task Completed.");
+            progressBarMaps.setIndeterminate(false);
+            progressBarMaps.setStringPainted(true);
+            progressBarMaps.setValue(100);
+            if (!taskLog.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Task completed with the following errors:\n" + taskLog, "Task Completed with Error.", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Task completed.\n" + taskLog, "Task Completed", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+
+    }
+
+    private class taskGeneratePlots extends SwingWorker<Void, String> {
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            taskLog = "";
+            if (dir == null) {
+                JOptionPane.showMessageDialog(frame, "Please select directory to save plots.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                //Select directory to store files
+                JFileChooser Fc = new JFileChooser();
+                Fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                if (Fc.showOpenDialog(null) == JFileChooser.CANCEL_OPTION) {
+                    return null;
+                }
+                dir = Fc.getSelectedFile();
+            }
+
+            //bitset for user selection of distvmeasure plot
+            BitSet bs = new BitSet(4);
+            bs.set(0, jCheckBoxRDistvRVel.isSelected());
+            bs.set(1, jCheckBoxRDistvRVelaP.isSelected());
+            bs.set(2, jCheckBoxRDistvRVelpP.isSelected());
+            bs.set(3, jCheckBoxRDistvRVelErr.isSelected());
+            return null;
+        }
+
+        @Override
+        protected void process(java.util.List<String> chunks) {
+            String curValue = chunks.get(chunks.size() - 1);
+            jLabelProgressBarPlots.setText("Progress: " + curValue);
+        }
+
+        @Override
+        protected void done() {
+            jLabelProgressBarPlots.setText("Progress Bar: Task Completed.");
+            progressBarPlots.setIndeterminate(false);
+            progressBarPlots.setStringPainted(true);
+            progressBarPlots.setValue(100);
+            if (!taskLog.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Task completed with the following errors:\n" + taskLog, "Task Completed with Error.", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Task completed.\n" + taskLog, "Task Completed", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 
     /**
@@ -953,25 +998,23 @@ public class WMSoftwareGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabelMaps;
     private javax.swing.JLabel jLabelMaps1;
     private javax.swing.JLabel jLabelMaps2;
     private javax.swing.JLabel jLabelPlots;
+    private javax.swing.JLabel jLabelProgressBarMaps;
+    private javax.swing.JLabel jLabelProgressBarPlots;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JProgressBar jProgressBar;
-    private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JProgressBar jProgressBar2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTableList;
     private javax.swing.JTextField jTextFieldTotalMiceNo;
     private javax.swing.JTextField jTextFieldTrials;
     private javax.swing.JTextField jTextFieldUserBin;
+    private javax.swing.JProgressBar progressBarMaps;
+    private javax.swing.JProgressBar progressBarPlots;
     // End of variables declaration//GEN-END:variables
 }
